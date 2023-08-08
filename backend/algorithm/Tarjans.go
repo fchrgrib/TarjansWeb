@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"backend/utils"
+	"strconv"
 )
 
 type Tarjans utils.SpecialStack
@@ -16,8 +17,9 @@ func (t *Tarjans) SCC() ([][]string, bool) {
 
 	fk := (*t)[0][0]
 	stackBefore.Push(fk)
-	lowKey.Push([]string{fk, fk, fk})
+	lowKey.Push([]string{fk, "0", "0", fk})
 
+	cT := 1
 	for !stackBefore.IsEmpty() {
 		valueStack, _ := stackBefore.Pop()
 
@@ -25,13 +27,16 @@ func (t *Tarjans) SCC() ([][]string, bool) {
 
 		for _, val := range nextNode {
 			if !lowKey.IsExist(val) {
-				lowKey.Push([]string{val, val, valueStack})
+				lowKey.Push([]string{val, strconv.Itoa(cT), strconv.Itoa(cT), valueStack})
 				stackBefore.Push(val)
+				cT++
 			} else {
-				if lowKey[lowKey.GetIdxFromKey(val)][0] < lowKey[lowKey.GetIdxFromKey(valueStack)][1] {
-					lowKey[lowKey.GetIdxFromKey(valueStack)][1] = lowKey[lowKey.GetIdxFromKey(val)][0]
-					if lowKey[lowKey.GetIdxFromKey(val)][2] > valueStack {
-						lowKey[lowKey.GetIdxFromKey(val)][2] = valueStack
+				a, _ := strconv.Atoi(lowKey[lowKey.GetIdxFromKey(val)][1])
+				b, _ := strconv.Atoi(lowKey[lowKey.GetIdxFromKey(valueStack)][2])
+				if a < b {
+					lowKey[lowKey.GetIdxFromKey(valueStack)][2] = lowKey[lowKey.GetIdxFromKey(val)][1]
+					if lowKey[lowKey.GetIdxFromKey(val)][3] > valueStack {
+						lowKey[lowKey.GetIdxFromKey(val)][3] = valueStack
 					}
 				}
 			}
@@ -40,10 +45,10 @@ func (t *Tarjans) SCC() ([][]string, bool) {
 
 	for i := len(lowKey) - 1; i >= 0; i-- {
 		n := lowKey[i]
-		nParent := lowKey[lowKey.GetIdxFromKey(n[2])]
+		nParent := lowKey[lowKey.GetIdxFromKey(n[3])]
 
-		if n[1] < nParent[1] {
-			lowKey[lowKey.GetIdxFromKey(nParent[0])][1] = n[1]
+		if n[2] < nParent[1] {
+			lowKey[lowKey.GetIdxFromKey(nParent[0])][2] = n[2]
 		}
 	}
 
@@ -51,18 +56,31 @@ func (t *Tarjans) SCC() ([][]string, bool) {
 
 	for key := range lowKey {
 		n := lowKey[key]
-		_, isExist := separate[n[1]]
-		if isExist {
-			separate[n[1]] = append(separate[n[1]], n[0])
-		} else {
-			separate[n[1]] = []string{n[0]}
+		separate[n[0]] = []string{n[0]}
+		for _, cek := range lowKey {
+			if n[1] == cek[2] && n[0] != cek[0] {
+				separate[n[0]] = append(separate[n[0]], cek[0])
+			}
 		}
 	}
 
 	var result [][]string
 	for s := range separate {
 		val, _ := separate[s]
-		result = append(result, val)
+		if len(val) == 1 {
+			i := 0
+			for k := range separate {
+				cek, _ := separate[k]
+				if !utils.CheckElmt(cek, val[0]) {
+					i++
+				}
+			}
+			if i == len(separate)-1 {
+				result = append(result, val)
+			}
+		} else {
+			result = append(result, val)
+		}
 	}
 
 	for idx, value := range result {
@@ -85,8 +103,9 @@ func (t *Tarjans) Bridge() ([][]string, bool) {
 
 	fk := (*t)[0][0]
 	stackBefore.Push(fk)
-	lowKey.Push([]string{fk, fk, fk})
+	lowKey.Push([]string{fk, "0", "0", fk})
 
+	cT := 1
 	for !stackBefore.IsEmpty() {
 		valueStack, _ := stackBefore.Pop()
 
@@ -94,13 +113,16 @@ func (t *Tarjans) Bridge() ([][]string, bool) {
 
 		for _, val := range nextNode {
 			if !lowKey.IsExist(val) {
-				lowKey.Push([]string{val, val, valueStack})
+				lowKey.Push([]string{val, strconv.Itoa(cT), strconv.Itoa(cT), valueStack})
 				stackBefore.Push(val)
+				cT++
 			} else {
-				if lowKey[lowKey.GetIdxFromKey(val)][0] < lowKey[lowKey.GetIdxFromKey(valueStack)][1] {
-					lowKey[lowKey.GetIdxFromKey(valueStack)][1] = lowKey[lowKey.GetIdxFromKey(val)][0]
-					if lowKey[lowKey.GetIdxFromKey(val)][2] > valueStack {
-						lowKey[lowKey.GetIdxFromKey(val)][2] = valueStack
+				a, _ := strconv.Atoi(lowKey[lowKey.GetIdxFromKey(val)][1])
+				b, _ := strconv.Atoi(lowKey[lowKey.GetIdxFromKey(valueStack)][2])
+				if a < b {
+					lowKey[lowKey.GetIdxFromKey(valueStack)][2] = lowKey[lowKey.GetIdxFromKey(val)][1]
+					if lowKey[lowKey.GetIdxFromKey(val)][3] > valueStack {
+						lowKey[lowKey.GetIdxFromKey(val)][3] = valueStack
 					}
 				}
 			}
@@ -109,10 +131,10 @@ func (t *Tarjans) Bridge() ([][]string, bool) {
 
 	for i := len(lowKey) - 1; i >= 0; i-- {
 		n := lowKey[i]
-		nParent := lowKey[lowKey.GetIdxFromKey(n[2])]
+		nParent := lowKey[lowKey.GetIdxFromKey(n[3])]
 
-		if n[1] < nParent[1] {
-			lowKey[lowKey.GetIdxFromKey(nParent[0])][1] = n[1]
+		if n[2] < nParent[1] {
+			lowKey[lowKey.GetIdxFromKey(nParent[0])][2] = n[2]
 		}
 	}
 
@@ -120,8 +142,8 @@ func (t *Tarjans) Bridge() ([][]string, bool) {
 
 	for i := len(lowKey) - 1; i >= 0; i-- {
 		n := lowKey[i]
-		nParent := lowKey[lowKey.GetIdxFromKey(n[2])]
-		if n[1] > nParent[0] {
+		nParent := lowKey[lowKey.GetIdxFromKey(n[3])]
+		if n[2] > nParent[1] {
 			result = append(result, []string{nParent[0], n[0]})
 		}
 	}
@@ -130,11 +152,11 @@ func (t *Tarjans) Bridge() ([][]string, bool) {
 
 	for key := range lowKey {
 		n := lowKey[key]
-		_, isExist := separate[n[1]]
+		_, isExist := separate[n[2]]
 		if isExist {
-			separate[n[1]] = append(separate[n[1]], n[0])
+			separate[n[2]] = append(separate[n[2]], n[0])
 		} else {
-			separate[n[1]] = []string{n[0]}
+			separate[n[2]] = []string{n[0]}
 		}
 	}
 
@@ -163,12 +185,7 @@ func (t *Tarjans) GetIdxFromKey(letter string) int {
 			return i
 		}
 	}
-	for _, cek := range *t {
-		for _, tes := range cek {
-			println(tes)
-		}
-	}
-	println(letter)
+
 	return -1
 }
 

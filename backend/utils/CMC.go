@@ -15,5 +15,11 @@ func ChangeToMultipleChild(input [][]string) [][]string {
 		}
 	}
 
+	for _, vII := range input {
+		if !ss.IsExist(vII[1]) {
+			ss.Push([]string{vII[1]})
+		}
+	}
+
 	return ss
 }

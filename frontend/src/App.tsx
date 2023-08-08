@@ -66,8 +66,12 @@ function App() {
             }
             let nodes = []
             if (type==="scc"){
-              for(let i=0;i<item.length-1;i++){
-                nodes.push({ id: item[i], label: item[i]})
+              if (item.length>1) {
+                for (let i = 0; i < item.length - 1; i++) {
+                  nodes.push({id: item[i], label: item[i]})
+                }
+              }else{
+                nodes.push({id: item[0], label: item[0]})
               }
             }else{
               nodes = item.map((node,idx) => ({ id: node, label: node}))
